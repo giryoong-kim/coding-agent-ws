@@ -9,8 +9,7 @@
 
     body {
       font-family: system-ui, -apple-system, sans-serif;
-      background: #0f1117;
-      color: #e2e8f0;
+      background: #f0f2f5;
       min-height: 100vh;
       display: flex;
       align-items: center;
@@ -19,19 +18,18 @@
     }
 
     .card {
-      background: #1a1d27;
-      border: 1px solid #2d3148;
+      background: #ffffff;
       border-radius: 12px;
-      padding: 2rem;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+      padding: 2.5rem 2rem;
       width: 100%;
-      max-width: 600px;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+      max-width: 560px;
     }
 
     h1 {
-      font-size: 1.5rem;
+      font-size: 1.6rem;
       font-weight: 700;
-      color: #a78bfa;
+      color: #1a1a2e;
       margin-bottom: 1.5rem;
       letter-spacing: -0.02em;
     }
@@ -39,39 +37,38 @@
     label {
       display: block;
       font-size: 0.85rem;
-      color: #94a3b8;
+      font-weight: 600;
+      color: #555;
       margin-bottom: 0.4rem;
-      font-weight: 500;
     }
 
     .input-row {
       display: flex;
-      gap: 0.5rem;
-      margin-bottom: 1rem;
+      gap: 0.6rem;
+      margin-bottom: 0.75rem;
     }
 
     input[type="text"] {
       flex: 1;
-      background: #0f1117;
-      border: 1px solid #2d3148;
+      padding: 0.6rem 0.85rem;
+      border: 1.5px solid #d0d5dd;
       border-radius: 8px;
-      padding: 0.6rem 0.9rem;
-      color: #e2e8f0;
       font-size: 1rem;
+      color: #1a1a2e;
       outline: none;
       transition: border-color 0.15s;
     }
 
     input[type="text"]:focus {
-      border-color: #7c3aed;
+      border-color: #4f6ef7;
     }
 
     button.estimate-btn {
-      background: #7c3aed;
+      padding: 0.6rem 1.2rem;
+      background: #4f6ef7;
       color: #fff;
       border: none;
       border-radius: 8px;
-      padding: 0.6rem 1.2rem;
       font-size: 1rem;
       font-weight: 600;
       cursor: pointer;
@@ -79,64 +76,81 @@
       white-space: nowrap;
     }
 
-    button.estimate-btn:hover { background: #6d28d9; }
-    button.estimate-btn:disabled { background: #4c1d95; cursor: not-allowed; opacity: 0.6; }
+    button.estimate-btn:hover {
+      background: #3a57e8;
+    }
+
+    button.estimate-btn:disabled {
+      background: #a0aec0;
+      cursor: not-allowed;
+    }
 
     .chips {
       display: flex;
       flex-wrap: wrap;
-      gap: 0.5rem;
+      gap: 0.45rem;
       margin-bottom: 1.5rem;
     }
 
     .chip {
-      background: #1e2235;
-      border: 1px solid #3b4266;
+      padding: 0.3rem 0.8rem;
+      background: #eef0fd;
+      color: #4f6ef7;
+      border: 1.5px solid #c5ccf8;
       border-radius: 999px;
-      padding: 0.3rem 0.85rem;
       font-size: 0.82rem;
-      color: #a5b4fc;
+      font-weight: 600;
       cursor: pointer;
-      transition: background 0.12s, border-color 0.12s;
+      transition: background 0.12s, color 0.12s;
       user-select: none;
     }
 
     .chip:hover {
-      background: #2a2f4a;
-      border-color: #7c3aed;
-      color: #c4b5fd;
+      background: #4f6ef7;
+      color: #fff;
+      border-color: #4f6ef7;
     }
 
     .result-label {
-      font-size: 0.8rem;
-      color: #64748b;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #555;
       margin-bottom: 0.4rem;
     }
 
     pre#result {
-      background: #0b0d14;
-      border: 1px solid #1e2235;
+      background: #f7f8fa;
+      border: 1.5px solid #e2e8f0;
       border-radius: 8px;
       padding: 1rem;
-      font-size: 0.85rem;
-      color: #86efac;
+      font-size: 0.88rem;
+      color: #1a1a2e;
+      min-height: 80px;
       white-space: pre-wrap;
       word-break: break-word;
-      min-height: 80px;
-      line-height: 1.6;
       overflow-x: auto;
     }
 
-    pre#result.error { color: #fca5a5; }
-    pre#result.loading { color: #94a3b8; font-style: italic; }
+    pre#result.error {
+      color: #c0392b;
+      background: #fff5f5;
+      border-color: #f5c6c6;
+    }
 
-    .endpoint-note {
-      margin-top: 1rem;
-      font-size: 0.72rem;
-      color: #475569;
-      text-align: right;
+    .spinner {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2.5px solid #fff;
+      border-top-color: transparent;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      vertical-align: middle;
+      margin-right: 6px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
     }
   </style>
 </head>
@@ -144,10 +158,16 @@
   <div class="card">
     <h1>Cost Analyzer Helpdesk</h1>
 
-    <label for="instance_type">instance type, e.g. m5.large</label>
+    <label for="instance-input">instance type, e.g. m5.large</label>
     <div class="input-row">
-      <input type="text" id="instance_type" placeholder="instance type, e.g. m5.large" autocomplete="off" />
-      <button class="estimate-btn" id="estimateBtn" onclick="runEstimate()">Estimate</button>
+      <input
+        type="text"
+        id="instance-input"
+        placeholder="instance type, e.g. m5.large"
+        autocomplete="off"
+        spellcheck="false"
+      />
+      <button class="estimate-btn" id="estimate-btn" onclick="runEstimate()">Estimate</button>
     </div>
 
     <div class="chips">
@@ -157,73 +177,78 @@
     </div>
 
     <div class="result-label">Result</div>
-    <pre id="result" class="loading">Enter an instance type and click Estimate.</pre>
-
-    <div class="endpoint-note">MCP endpoint: http://127.0.0.1:52985</div>
+    <pre id="result">Results will appear here after you click Estimate.</pre>
   </div>
 
   <script>
-    const ENDPOINT = "http://127.0.0.1:52985";
-    const TOOL = "estimate_ec2_monthly_cost";
-    const INPUT_FIELD = "instance_type";
+    const MCP_ENDPOINT = "http://127.0.0.1:46485";
 
     function prefill(value) {
-      document.getElementById(INPUT_FIELD).value = value;
-      document.getElementById(INPUT_FIELD).focus();
+      document.getElementById("instance-input").value = value;
+      document.getElementById("instance-input").focus();
     }
 
     async function runEstimate() {
-      const input = document.getElementById(INPUT_FIELD).value.trim();
+      const inputEl = document.getElementById("instance-input");
       const resultEl = document.getElementById("result");
-      const btn = document.getElementById("estimateBtn");
+      const btn = document.getElementById("estimate-btn");
 
-      if (!input) {
+      const instanceType = inputEl.value.trim();
+      if (!instanceType) {
         resultEl.className = "error";
-        resultEl.textContent = "Error: please enter an instance type.";
+        resultEl.textContent = "Please enter an instance type before estimating.";
         return;
       }
 
-      resultEl.className = "loading";
-      resultEl.textContent = "Calling MCP endpoint...";
       btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span>Loading…';
+      resultEl.className = "";
+      resultEl.textContent = "Calling MCP endpoint…";
 
       const requestBody = {
         jsonrpc: "2.0",
         id: Date.now(),
         method: "tools/call",
         params: {
-          name: TOOL,
+          name: "estimate_ec2_monthly_cost",
           arguments: {
-            [INPUT_FIELD]: input
+            instance_type: instanceType
           }
         }
       };
 
       try {
-        const response = await fetch(ENDPOINT, {
+        const response = await fetch(MCP_ENDPOINT, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json"
+          },
           body: JSON.stringify(requestBody)
         });
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status} ${response.statusText}`);
+        }
 
         const data = await response.json();
 
         if (data.error) {
           resultEl.className = "error";
-          resultEl.textContent = "JSON-RPC Error:\n" + JSON.stringify(data.error, null, 2);
+          resultEl.textContent = "JSON-RPC error:\n" + JSON.stringify(data.error, null, 2);
         } else {
           resultEl.className = "";
           resultEl.textContent = JSON.stringify(data.result, null, 2);
         }
       } catch (err) {
         resultEl.className = "error";
-        resultEl.textContent = "Fetch error: " + err.message;
+        resultEl.textContent = "Request failed:\n" + err.message;
       } finally {
         btn.disabled = false;
+        btn.textContent = "Estimate";
       }
     }
 
-    document.getElementById(INPUT_FIELD).addEventListener("keydown", function(e) {
+    document.getElementById("instance-input").addEventListener("keydown", function (e) {
       if (e.key === "Enter") runEstimate();
     });
   </script>
