@@ -1,0 +1,65 @@
+{
+  "run_id": "run_181135_001",
+  "endpoint": "http://127.0.0.1:54443",
+  "iterations": 1,
+  "gate": {
+    "passed": true,
+    "checks": [
+      {
+        "check": "tool_discovery",
+        "passed": true,
+        "detail": "all required tools discoverable"
+      },
+      {
+        "check": "tool_correctness",
+        "passed": true,
+        "detail": "5 fixture cases correct"
+      },
+      {
+        "check": "input_validation",
+        "passed": true,
+        "detail": "unknown instance type correctly rejected"
+      }
+    ],
+    "pytest": "10 passed in 0.06s"
+  },
+  "review": {
+    "state": "approved",
+    "lgtm": true,
+    "round": 1,
+    "gate": {
+      "passed": true,
+      "checks": [
+        {
+          "check": "tool_discovery",
+          "passed": true,
+          "detail": "all required tools discoverable"
+        },
+        {
+          "check": "tool_correctness",
+          "passed": true,
+          "detail": "5 fixture cases correct"
+        },
+        {
+          "check": "input_validation",
+          "passed": true,
+          "detail": "unknown instance type correctly rejected"
+        }
+      ],
+      "pytest": "10 passed in 0.06s"
+    },
+    "critique": [
+      {
+        "check": "server_imports_module",
+        "passed": true,
+        "detail": "server imports cost_analyzer live (no copied logic)"
+      },
+      {
+        "check": "branch_maps_to_run",
+        "passed": true,
+        "detail": "no composed branch yet"
+      }
+    ]
+  },
+  "workflow_ref": "patch/backend-v1"
+}
