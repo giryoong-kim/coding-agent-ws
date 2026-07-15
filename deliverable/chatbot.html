@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cost Analyzer Helpdesk</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: #0f1117;
+      color: #e2e8f0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+
+    .card {
+      background: #1a1d27;
+      border: 1px solid #2d3148;
+      border-radius: 12px;
+      padding: 2rem;
+      width: 100%;
+      max-width: 600px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    }
+
+    h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #a78bfa;
+      margin-bottom: 1.5rem;
+      letter-spacing: -0.02em;
+    }
+
+    label {
+      display: block;
+      font-size: 0.85rem;
+      color: #94a3b8;
+      margin-bottom: 0.4rem;
+      font-weight: 500;
+    }
+
+    .input-row {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    input[type="text"] {
+      flex: 1;
+      background: #0f1117;
+      border: 1px solid #2d3148;
+      border-radius: 8px;
+      padding: 0.6rem 0.9rem;
+      color: #e2e8f0;
+      font-size: 1rem;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    input[type="text"]:focus {
+      border-color: #7c3aed;
+    }
+
+    button.estimate-btn {
+      background: #7c3aed;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 0.6rem 1.2rem;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s;
+      white-space: nowrap;
+    }
+
+    button.estimate-btn:hover { background: #6d28d9; }
+    button.estimate-btn:disabled { background: #4c1d95; cursor: not-allowed; opacity: 0.6; }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .chip {
+      background: #1e2235;
+      border: 1px solid #3b4266;
+      border-radius: 999px;
+      padding: 0.3rem 0.85rem;
+      font-size: 0.82rem;
+      color: #a5b4fc;
+      cursor: pointer;
+      transition: background 0.12s, border-color 0.12s;
+      user-select: none;
+    }
+
+    .chip:hover {
+      background: #2a2f4a;
+      border-color: #7c3aed;
+      color: #c4b5fd;
+    }
+
+    .result-label {
+      font-size: 0.8rem;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 0.4rem;
+    }
+
+    pre#result {
+      background: #0b0d14;
+      border: 1px solid #1e2235;
+      border-radius: 8px;
+      padding: 1rem;
+      font-size: 0.85rem;
+      color: #86efac;
+      white-space: pre-wrap;
+      word-break: break-word;
+      min-height: 80px;
+      line-height: 1.6;
+      overflow-x: auto;
+    }
+
+    pre#result.error { color: #fca5a5; }
+    pre#result.loading { color: #94a3b8; font-style: italic; }
+
+    .endpoint-note {
+      margin-top: 1rem;
+      font-size: 0.72rem;
+      color: #475569;
+      text-align: right;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Cost Analyzer Helpdesk</h1>
+
+    <label for="instance_type">instance type, e.g. m5.large</label>
+    <div class="input-row">
+      <input type="text" id="instance_type" placeholder="instance type, e.g. m5.large" autocomplete="off" />
+      <button class="estimate-btn" id="estimateBtn" onclick="runEstimate()">Estimate</button>
+    </div>
+
+    <div class="chips">
+      <span class="chip" onclick="prefill('m5.large')">m5.large</span>
+      <span class="chip" onclick="prefill('t3.micro')">t3.micro</span>
+      <span class="chip" onclick="prefill('r5.xlarge')">r5.xlarge</span>
+    </div>
+
+    <div class="result-label">Result</div>
+    <pre id="result" class="loading">Enter an instance type and click Estimate.</pre>
+
+    <div class="endpoint-note">MCP endpoint: http://127.0.0.1:52985</div>
+  </div>
+
+  <script>
+    const ENDPOINT = "http://127.0.0.1:52985";
+    const TOOL = "estimate_ec2_monthly_cost";
+    const INPUT_FIELD = "instance_type";
+
+    function prefill(value) {
+      document.getElementById(INPUT_FIELD).value = value;
+      document.getElementById(INPUT_FIELD).focus();
+    }
+
+    async function runEstimate() {
+      const input = document.getElementById(INPUT_FIELD).value.trim();
+      const resultEl = document.getElementById("result");
+      const btn = document.getElementById("estimateBtn");
+
+      if (!input) {
+        resultEl.className = "error";
+        resultEl.textContent = "Error: please enter an instance type.";
+        return;
+      }
+
+      resultEl.className = "loading";
+      resultEl.textContent = "Calling MCP endpoint...";
+      btn.disabled = true;
+
+      const requestBody = {
+        jsonrpc: "2.0",
+        id: Date.now(),
+        method: "tools/call",
+        params: {
+          name: TOOL,
+          arguments: {
+            [INPUT_FIELD]: input
+          }
+        }
+      };
+
+      try {
+        const response = await fetch(ENDPOINT, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(requestBody)
+        });
+
+        const data = await response.json();
+
+        if (data.error) {
+          resultEl.className = "error";
+          resultEl.textContent = "JSON-RPC Error:\n" + JSON.stringify(data.error, null, 2);
+        } else {
+          resultEl.className = "";
+          resultEl.textContent = JSON.stringify(data.result, null, 2);
+        }
+      } catch (err) {
+        resultEl.className = "error";
+        resultEl.textContent = "Fetch error: " + err.message;
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    document.getElementById(INPUT_FIELD).addEventListener("keydown", function(e) {
+      if (e.key === "Enter") runEstimate();
+    });
+  </script>
+</body>
+</html>
