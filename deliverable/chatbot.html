@@ -9,161 +9,144 @@
 
     body {
       font-family: system-ui, -apple-system, sans-serif;
-      background: #0f1117;
-      color: #e2e8f0;
+      background: #f0f4f8;
       min-height: 100vh;
       display: flex;
-      flex-direction: column;
       align-items: center;
-      padding: 2rem 1rem;
-    }
-
-    header {
-      text-align: center;
-      margin-bottom: 2rem;
-    }
-
-    header h1 {
-      font-size: 1.8rem;
-      font-weight: 700;
-      color: #f8fafc;
-      letter-spacing: -0.02em;
-    }
-
-    header p {
-      margin-top: 0.4rem;
-      color: #94a3b8;
-      font-size: 0.9rem;
+      justify-content: center;
+      padding: 1.5rem;
     }
 
     .card {
-      background: #1e2330;
-      border: 1px solid #2d3448;
+      background: #fff;
       border-radius: 12px;
-      padding: 1.5rem;
-      width: 100%;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.10);
       max-width: 560px;
+      width: 100%;
+      padding: 2rem 2rem 1.75rem;
+    }
+
+    h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #1a202c;
+      margin-bottom: 1.5rem;
     }
 
     label {
       display: block;
       font-size: 0.85rem;
-      font-weight: 500;
-      color: #94a3b8;
-      margin-bottom: 0.5rem;
+      font-weight: 600;
+      color: #4a5568;
+      margin-bottom: 0.4rem;
     }
 
     .input-row {
       display: flex;
       gap: 0.5rem;
+      margin-bottom: 0.75rem;
     }
 
     input[type="text"] {
       flex: 1;
-      background: #0f1117;
-      border: 1px solid #2d3448;
+      padding: 0.55rem 0.85rem;
+      border: 1.5px solid #cbd5e0;
       border-radius: 8px;
-      color: #e2e8f0;
-      font-size: 0.95rem;
-      padding: 0.55rem 0.8rem;
+      font-size: 1rem;
+      color: #1a202c;
       outline: none;
       transition: border-color 0.15s;
     }
 
     input[type="text"]:focus {
-      border-color: #6366f1;
+      border-color: #4299e1;
     }
 
     button.estimate-btn {
-      background: #6366f1;
+      padding: 0.55rem 1.2rem;
+      background: #4299e1;
+      color: #fff;
       border: none;
       border-radius: 8px;
-      color: #fff;
-      cursor: pointer;
-      font-size: 0.9rem;
+      font-size: 1rem;
       font-weight: 600;
-      padding: 0.55rem 1.1rem;
+      cursor: pointer;
       transition: background 0.15s;
       white-space: nowrap;
     }
 
-    button.estimate-btn:hover { background: #4f46e5; }
-    button.estimate-btn:disabled { background: #3730a3; cursor: not-allowed; }
+    button.estimate-btn:hover {
+      background: #2b6cb0;
+    }
+
+    button.estimate-btn:disabled {
+      background: #a0aec0;
+      cursor: not-allowed;
+    }
 
     .chips {
       display: flex;
       flex-wrap: wrap;
       gap: 0.4rem;
-      margin-top: 0.9rem;
+      margin-bottom: 1.25rem;
     }
 
     .chip {
-      background: #2d3448;
-      border: 1px solid #3d4663;
-      border-radius: 20px;
-      color: #a5b4fc;
-      cursor: pointer;
-      font-size: 0.8rem;
       padding: 0.3rem 0.75rem;
-      transition: background 0.15s, border-color 0.15s;
+      background: #ebf8ff;
+      color: #2b6cb0;
+      border: 1.5px solid #bee3f8;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.12s, border-color 0.12s;
     }
 
     .chip:hover {
-      background: #3d4663;
-      border-color: #6366f1;
-      color: #c7d2fe;
+      background: #bee3f8;
+      border-color: #90cdf4;
     }
 
-    .result-section {
-      margin-top: 1.25rem;
-    }
-
-    .result-section h2 {
-      font-size: 0.8rem;
+    .result-label {
+      font-size: 0.85rem;
       font-weight: 600;
-      color: #64748b;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      margin-bottom: 0.5rem;
+      color: #4a5568;
+      margin-bottom: 0.4rem;
     }
 
-    pre {
-      background: #0a0d14;
-      border: 1px solid #2d3448;
+    pre#result {
+      background: #1a202c;
+      color: #e2e8f0;
       border-radius: 8px;
-      color: #86efac;
-      font-family: "Fira Mono", "Consolas", monospace;
-      font-size: 0.82rem;
-      line-height: 1.6;
-      overflow-x: auto;
       padding: 1rem;
+      font-size: 0.85rem;
+      line-height: 1.6;
+      min-height: 3.5rem;
+      max-height: 320px;
+      overflow-y: auto;
       white-space: pre-wrap;
       word-break: break-word;
-      min-height: 3rem;
     }
 
-    pre.error { color: #f87171; }
-    pre.loading { color: #94a3b8; font-style: italic; }
+    .status {
+      font-size: 0.8rem;
+      color: #718096;
+      margin-top: 0.6rem;
+      min-height: 1.1em;
+    }
+
+    .error-text { color: #fc8181; }
   </style>
 </head>
 <body>
-
-  <header>
-    <h1>Cost Analyzer Helpdesk</h1>
-    <p>Enter an EC2 instance type to get a monthly cost estimate.</p>
-  </header>
-
   <div class="card">
-    <label for="instance-input">instance type, e.g. m5.large</label>
+    <h1>Cost Analyzer Helpdesk</h1>
+
+    <label for="instance_type">instance type, e.g. m5.large</label>
     <div class="input-row">
-      <input
-        type="text"
-        id="instance-input"
-        placeholder="instance type, e.g. m5.large"
-        autocomplete="off"
-        spellcheck="false"
-      />
-      <button class="estimate-btn" id="estimate-btn" onclick="runEstimate()">Estimate</button>
+      <input type="text" id="instance_type" placeholder="instance type, e.g. m5.large" autocomplete="off" />
+      <button class="estimate-btn" id="estimateBtn" onclick="runEstimate()">Estimate</button>
     </div>
 
     <div class="chips">
@@ -172,35 +155,36 @@
       <span class="chip" onclick="prefill('r5.xlarge')">r5.xlarge</span>
     </div>
 
-    <div class="result-section">
-      <h2>Result</h2>
-      <pre id="result-box">Results will appear here.</pre>
-    </div>
+    <div class="result-label">Result</div>
+    <pre id="result">Results will appear here...</pre>
+    <div class="status" id="status"></div>
   </div>
 
   <script>
-    const MCP_ENDPOINT = "http://127.0.0.1:57965";
+    const MCP_ENDPOINT = "http://127.0.0.1:40469";
 
     function prefill(value) {
-      document.getElementById("instance-input").value = value;
-      document.getElementById("instance-input").focus();
+      document.getElementById("instance_type").value = value;
+      document.getElementById("instance_type").focus();
     }
 
     async function runEstimate() {
-      const inputEl = document.getElementById("instance-input");
-      const resultBox = document.getElementById("result-box");
-      const btn = document.getElementById("estimate-btn");
+      const inputEl = document.getElementById("instance_type");
+      const resultEl = document.getElementById("result");
+      const statusEl = document.getElementById("status");
+      const btn = document.getElementById("estimateBtn");
 
       const instanceType = inputEl.value.trim();
       if (!instanceType) {
-        resultBox.className = "error";
-        resultBox.textContent = "Please enter an instance type before clicking Estimate.";
+        statusEl.textContent = "Please enter an instance type.";
+        statusEl.className = "status error-text";
         return;
       }
 
       btn.disabled = true;
-      resultBox.className = "loading";
-      resultBox.textContent = "Calling MCP endpoint...";
+      statusEl.className = "status";
+      statusEl.textContent = "Calling MCP endpoint...";
+      resultEl.textContent = "";
 
       const requestBody = {
         jsonrpc: "2.0",
@@ -217,35 +201,35 @@
       try {
         const response = await fetch(MCP_ENDPOINT, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json"
+          },
           body: JSON.stringify(requestBody)
         });
-
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-        }
 
         const data = await response.json();
 
         if (data.error) {
-          resultBox.className = "error";
-          resultBox.textContent = JSON.stringify(data.error, null, 2);
+          resultEl.textContent = JSON.stringify(data.error, null, 2);
+          statusEl.textContent = "MCP returned an error.";
+          statusEl.className = "status error-text";
         } else {
-          resultBox.className = "";
-          resultBox.textContent = JSON.stringify(data.result, null, 2);
+          resultEl.textContent = JSON.stringify(data.result, null, 2);
+          statusEl.textContent = "Done.";
+          statusEl.className = "status";
         }
       } catch (err) {
-        resultBox.className = "error";
-        resultBox.textContent = "Error: " + err.message;
+        resultEl.textContent = String(err);
+        statusEl.textContent = "Request failed.";
+        statusEl.className = "status error-text";
       } finally {
         btn.disabled = false;
       }
     }
 
-    document.getElementById("instance-input").addEventListener("keydown", function (e) {
+    document.getElementById("instance_type").addEventListener("keydown", function(e) {
       if (e.key === "Enter") runEstimate();
     });
   </script>
-
 </body>
 </html>
