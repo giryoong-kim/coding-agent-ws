@@ -1,6 +1,6 @@
 {
-  "run_id": "run_181135_001",
-  "endpoint": "http://127.0.0.1:54443",
+  "run_id": "run_194901_001",
+  "endpoint": "http://127.0.0.1:46485",
   "iterations": 1,
   "gate": {
     "passed": true,
@@ -13,15 +13,20 @@
       {
         "check": "tool_correctness",
         "passed": true,
-        "detail": "5 fixture cases correct"
+        "detail": "6 fixture cases correct"
       },
       {
         "check": "input_validation",
         "passed": true,
-        "detail": "unknown instance type correctly rejected"
+        "detail": "empty name, unknown element, and oversized team all rejected"
+      },
+      {
+        "check": "card_renders",
+        "passed": true,
+        "detail": "card renders with name + element"
       }
     ],
-    "pytest": "10 passed in 0.06s"
+    "pytest": "14 passed in 0.05s"
   },
   "review": {
     "state": "approved",
@@ -38,21 +43,31 @@
         {
           "check": "tool_correctness",
           "passed": true,
-          "detail": "5 fixture cases correct"
+          "detail": "6 fixture cases correct"
         },
         {
           "check": "input_validation",
           "passed": true,
-          "detail": "unknown instance type correctly rejected"
+          "detail": "empty name, unknown element, and oversized team all rejected"
+        },
+        {
+          "check": "card_renders",
+          "passed": true,
+          "detail": "card renders with name + element"
         }
       ],
-      "pytest": "10 passed in 0.06s"
+      "pytest": "14 passed in 0.05s"
     },
     "critique": [
       {
         "check": "server_imports_module",
         "passed": true,
-        "detail": "server imports cost_analyzer live (no copied logic)"
+        "detail": "server imports critter_lab live (no copied logic)"
+      },
+      {
+        "check": "frontend_is_thin",
+        "passed": true,
+        "detail": "chatbot delegates every answer to tools/call over the wire"
       },
       {
         "check": "branch_maps_to_run",
@@ -61,5 +76,5 @@
       }
     ]
   },
-  "workflow_ref": "patch/backend-v1"
+  "workflow_ref": "build/fullstack-v1"
 }
