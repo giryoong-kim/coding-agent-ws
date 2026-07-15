@@ -1,0 +1,70 @@
+{
+  "run_id": "run_181055_001",
+  "endpoint": "http://127.0.0.1:52985",
+  "iterations": 1,
+  "gate": {
+    "passed": true,
+    "checks": [
+      {
+        "check": "tool_discovery",
+        "passed": true,
+        "detail": "all required tools discoverable"
+      },
+      {
+        "check": "tool_correctness",
+        "passed": true,
+        "detail": "5 fixture cases correct"
+      },
+      {
+        "check": "input_validation",
+        "passed": true,
+        "detail": "unknown instance type correctly rejected"
+      }
+    ],
+    "pytest": "10 passed in 0.05s"
+  },
+  "review": {
+    "state": "approved",
+    "lgtm": true,
+    "round": 1,
+    "gate": {
+      "passed": true,
+      "checks": [
+        {
+          "check": "tool_discovery",
+          "passed": true,
+          "detail": "all required tools discoverable"
+        },
+        {
+          "check": "tool_correctness",
+          "passed": true,
+          "detail": "5 fixture cases correct"
+        },
+        {
+          "check": "input_validation",
+          "passed": true,
+          "detail": "unknown instance type correctly rejected"
+        }
+      ],
+      "pytest": "10 passed in 0.05s"
+    },
+    "critique": [
+      {
+        "check": "server_imports_module",
+        "passed": true,
+        "detail": "server imports cost_analyzer live (no copied logic)"
+      },
+      {
+        "check": "frontend_is_thin",
+        "passed": true,
+        "detail": "chatbot delegates every answer to tools/call over the wire"
+      },
+      {
+        "check": "branch_maps_to_run",
+        "passed": true,
+        "detail": "no composed branch yet"
+      }
+    ]
+  },
+  "workflow_ref": "convert/sample-to-mcp-v1"
+}
