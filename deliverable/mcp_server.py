@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""MCP JSON-RPC 2.0 server wrapping the cost_analyzer module."""
+"""MCP server for cost_analyzer: JSON-RPC 2.0 over HTTP, stdlib only."""
 
 import argparse
 import json
@@ -11,55 +11,12 @@ sys.path.insert(0, os.environ.get("COST_ANALYZER_DIR", os.path.dirname(os.path.a
 import cost_analyzer
 
 SERVER_NAME = "cost_analyzer"
-SERVER_VERSION = "1.0.0"
+SERVER_VERSION = "0.1.0"
 PROTOCOL_VERSION = "2024-11-05"
 
 
-def make_response(id_, result):
-    return {"jsonrpc": "2.0", "id": id_, "result": result}
-
-
-def make_error(id_, code, message):
-    return {"jsonrpc": "2.0", "id": id_, "error": {"code": code, "message": message}}
-
-
-def handle_initialize(id_, _params):
-    return make_response(id_, {
-        "protocolVersion": PROTOCOL_VERSION,
-        "serverInfo": {"name": SERVER_NAME, "version": SERVER_VERSION},
-        "capabilities": {"tools": {}},
-    })
-
-
-def handle_tools_list(id_, _params):
-    return make_response(id_, {"tools": cost_analyzer.list_tools()})
-
-
-def handle_tools_call(id_, params):
-    name = params.get("name")
-    arguments = params.get("arguments") or {}
-
-    try:
-        result = cost_analyzer.dispatch(name, arguments)
-    except cost_analyzer.UnknownResourceError:
-        return make_error(id_, -32601, f"Unknown tool: {name!r}")
-    except (ValueError, TypeError) as exc:
-        return make_error(id_, -32602, str(exc))
-
-    return make_response(id_, {
-        "content": [{"type": "text", "text": json.dumps(result)}],
-        "isError": False,
-    })
-
-
-METHODS = {
-    "initialize": handle_initialize,
-    "tools/list": handle_tools_list,
-    "tools/call": handle_tools_call,
-}
-
-
 class MCPHandler(BaseHTTPRequestHandler):
+
     def do_GET(self):
         body = json.dumps({"status": "ok", "server": SERVER_NAME, "version": SERVER_VERSION}).encode()
         self.send_response(200)
@@ -71,25 +28,45 @@ class MCPHandler(BaseHTTPRequestHandler):
     def do_POST(self):
         length = int(self.headers.get("Content-Length", 0))
         raw = self.rfile.read(length)
-
         try:
             request = json.loads(raw)
         except (json.JSONDecodeError, ValueError):
-            resp = make_error(None, -32700, "Parse error")
-            self._send_json(resp)
+            self._send_json({"jsonrpc": "2.0", "id": None, "error": {"code": -32700, "message": "Parse error"}})
             return
 
-        id_ = request.get("id")
-        method = request.get("method")
-        params = request.get("params") or {}
+        req_id = request.get("id")
+        method = request.get("method", "")
+        params = request.get("params", {})
 
-        handler = METHODS.get(method)
-        if handler is None:
-            resp = make_error(id_, -32601, f"Unknown method: {method!r}")
+        if method == "initialize":
+            result = {
+                "protocolVersion": PROTOCOL_VERSION,
+                "serverInfo": {"name": SERVER_NAME, "version": SERVER_VERSION},
+                "capabilities": {"tools": {}},
+            }
+            self._send_json({"jsonrpc": "2.0", "id": req_id, "result": result})
+
+        elif method == "tools/list":
+            tools = cost_analyzer.list_tools()
+            self._send_json({"jsonrpc": "2.0", "id": req_id, "result": {"tools": tools}})
+
+        elif method == "tools/call":
+            name = params.get("name", "")
+            arguments = params.get("arguments", {})
+            try:
+                result = cost_analyzer.dispatch(name, arguments)
+                call_result = {
+                    "content": [{"type": "text", "text": json.dumps(result)}],
+                    "isError": False,
+                }
+                self._send_json({"jsonrpc": "2.0", "id": req_id, "result": call_result})
+            except cost_analyzer.UnknownResourceError:
+                self._send_json({"jsonrpc": "2.0", "id": req_id, "error": {"code": -32601, "message": f"Unknown tool: {name}"}})
+            except (ValueError, TypeError) as exc:
+                self._send_json({"jsonrpc": "2.0", "id": req_id, "error": {"code": -32602, "message": str(exc)}})
+
         else:
-            resp = handler(id_, params)
-
-        self._send_json(resp)
+            self._send_json({"jsonrpc": "2.0", "id": req_id, "error": {"code": -32601, "message": f"Unknown method: {method}"}})
 
     def _send_json(self, obj):
         body = json.dumps(obj).encode()
