@@ -1,117 +1,111 @@
-#!/usr/bin/env python3
-"""MCP JSON-RPC 2.0 server wrapping the cost_analyzer module."""
+"""Remote MCP server exposing cost_analyzer tools over HTTP JSON-RPC.
+
+Uses only the Python standard library. Start with:
+    python3 mcp_server.py --port 9000
+"""
 
 import argparse
 import json
 import os
 import sys
-from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from http.server import BaseHTTPRequestHandler
+from socketserver import ThreadingMixIn
+from http.server import HTTPServer
 
 sys.path.insert(0, os.environ.get("COST_ANALYZER_DIR", os.path.dirname(os.path.abspath(__file__))))
 import cost_analyzer
 
-SERVER_NAME = "cost_analyzer"
-SERVER_VERSION = "0.1.0"
-PROTOCOL_VERSION = "2024-11-05"
+
+SERVER_NAME = "cost-analyzer-mcp"
+SERVER_VERSION = "1.0.0"
 
 
-def handle_jsonrpc(request):
-    method = request.get("method")
-    req_id = request.get("id")
-
-    if method == "initialize":
-        result = {
-            "protocolVersion": PROTOCOL_VERSION,
-            "serverInfo": {"name": SERVER_NAME, "version": SERVER_VERSION},
-            "capabilities": {"tools": {}},
-        }
-        return {"jsonrpc": "2.0", "id": req_id, "result": result}
-
-    if method == "tools/list":
-        tools = cost_analyzer.list_tools()
-        return {"jsonrpc": "2.0", "id": req_id, "result": {"tools": tools}}
-
-    if method == "tools/call":
-        params = request.get("params", {})
-        name = params.get("name")
-        arguments = params.get("arguments", {})
-        try:
-            result = cost_analyzer.dispatch(name, arguments)
-        except (cost_analyzer.UnknownResourceError, KeyError) as exc:
-            if isinstance(exc, cost_analyzer.UnknownResourceError) and "Unknown tool" in str(exc):
-                return {
-                    "jsonrpc": "2.0",
-                    "id": req_id,
-                    "error": {"code": -32601, "message": str(exc)},
-                }
-            return {
-                "jsonrpc": "2.0",
-                "id": req_id,
-                "error": {"code": -32602, "message": str(exc)},
-            }
-        except (ValueError, TypeError) as exc:
-            return {
-                "jsonrpc": "2.0",
-                "id": req_id,
-                "error": {"code": -32602, "message": str(exc)},
-            }
-        return {
-            "jsonrpc": "2.0",
-            "id": req_id,
-            "result": {
-                "content": [{"type": "text", "text": json.dumps(result)}],
-                "isError": False,
-            },
-        }
-
-    return {
-        "jsonrpc": "2.0",
-        "id": req_id,
-        "error": {"code": -32601, "message": f"Unknown method: {method}"},
-    }
+class ThreadingHTTPServer(ThreadingMixIn, HTTPServer):
+    daemon_threads = True
 
 
 class MCPHandler(BaseHTTPRequestHandler):
+
     def do_GET(self):
-        body = json.dumps({"status": "ok", "server": SERVER_NAME, "version": SERVER_VERSION}).encode()
-        self.send_response(200)
-        self.send_header("Content-Type", "application/json")
-        self.send_header("Content-Length", str(len(body)))
-        self.end_headers()
-        self.wfile.write(body)
+        self._send_json_response(200, {
+            "status": "ok",
+            "server": SERVER_NAME,
+            "version": SERVER_VERSION,
+        })
 
     def do_POST(self):
-        length = int(self.headers.get("Content-Length", 0))
-        raw = self.rfile.read(length)
-        try:
-            request = json.loads(raw)
-        except (json.JSONDecodeError, ValueError):
-            resp = {"jsonrpc": "2.0", "id": None, "error": {"code": -32700, "message": "Parse error"}}
-            self._send_json(resp)
-            return
-        resp = handle_jsonrpc(request)
-        self._send_json(resp)
+        content_length = int(self.headers.get("Content-Length", 0))
+        body = self.rfile.read(content_length)
 
-    def _send_json(self, obj):
-        body = json.dumps(obj).encode()
-        self.send_response(200)
+        try:
+            request = json.loads(body)
+        except (json.JSONDecodeError, ValueError):
+            self._send_jsonrpc_error(None, -32700, "Parse error")
+            return
+
+        req_id = request.get("id")
+        method = request.get("method", "")
+        params = request.get("params", {})
+
+        if method == "initialize":
+            self._send_result(req_id, {
+                "protocolVersion": "2024-11-05",
+                "capabilities": {"tools": {"listChanged": False}},
+                "serverInfo": {"name": SERVER_NAME, "version": SERVER_VERSION},
+            })
+        elif method == "tools/list":
+            tools = cost_analyzer.list_tools()
+            self._send_result(req_id, {"tools": tools})
+        elif method == "tools/call":
+            tool_name = params.get("name", "")
+            arguments = params.get("arguments", {})
+            try:
+                result = cost_analyzer.dispatch(tool_name, arguments)
+                self._send_result(req_id, {
+                    "content": [{"type": "text", "text": json.dumps(result)}],
+                    "isError": False,
+                })
+            except (ValueError, TypeError) as exc:
+                self._send_jsonrpc_error(req_id, -32602, str(exc))
+        else:
+            self._send_jsonrpc_error(req_id, -32601, f"Method not found: {method!r}")
+
+    def _send_result(self, req_id, result):
+        self._send_json_response(200, {
+            "jsonrpc": "2.0",
+            "id": req_id,
+            "result": result,
+        })
+
+    def _send_jsonrpc_error(self, req_id, code, message):
+        self._send_json_response(200, {
+            "jsonrpc": "2.0",
+            "id": req_id,
+            "error": {"code": code, "message": message},
+        })
+
+    def _send_json_response(self, status, obj):
+        payload = json.dumps(obj).encode()
+        self.send_response(status)
         self.send_header("Content-Type", "application/json")
-        self.send_header("Content-Length", str(len(body)))
+        self.send_header("Content-Length", str(len(payload)))
         self.end_headers()
-        self.wfile.write(body)
+        self.wfile.write(payload)
 
     def log_message(self, format, *args):
         pass
 
 
 def main():
-    parser = argparse.ArgumentParser(description="MCP server for cost_analyzer")
-    parser.add_argument("--port", type=int, default=int(os.environ.get("MCP_PORT", "9000")))
-    parser.add_argument("--host", default="127.0.0.1")
+    default_port = int(os.environ.get("MCP_PORT", "9000"))
+
+    parser = argparse.ArgumentParser(description="Cost Analyzer MCP Server")
+    parser.add_argument("--port", type=int, default=default_port)
+    parser.add_argument("--host", type=str, default="127.0.0.1")
     args = parser.parse_args()
 
     server = ThreadingHTTPServer((args.host, args.port), MCPHandler)
-    print(f"{SERVER_NAME} MCP server listening on {args.host}:{args.port}")
+    print(f"MCP server listening on {args.host}:{args.port}")
     server.serve_forever()
 
 
