@@ -1,5 +1,4 @@
-#!/usr/bin/env python3
-"""MCP server for critter_lab — JSON-RPC 2.0 over HTTP."""
+"""MCP server wrapping cost_analyzer as a JSON-RPC 2.0 HTTP service."""
 
 import argparse
 import json
@@ -8,14 +7,17 @@ import sys
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 sys.path.insert(0, os.environ.get("COST_ANALYZER_DIR", os.path.dirname(os.path.abspath(__file__))))
-import critter_lab
+import cost_analyzer
 
-SERVER_NAME = "critter_lab"
+SERVER_NAME = "cost-analyzer-mcp"
 SERVER_VERSION = "1.0.0"
 PROTOCOL_VERSION = "2024-11-05"
 
 
 class MCPHandler(BaseHTTPRequestHandler):
+
+    def log_message(self, format, *args):
+        pass
 
     def do_GET(self):
         body = json.dumps({"status": "ok", "server": SERVER_NAME, "version": SERVER_VERSION}).encode()
@@ -28,66 +30,51 @@ class MCPHandler(BaseHTTPRequestHandler):
     def do_POST(self):
         length = int(self.headers.get("Content-Length", 0))
         raw = self.rfile.read(length)
+
         try:
             request = json.loads(raw)
         except (json.JSONDecodeError, ValueError):
-            self._send_json({"jsonrpc": "2.0", "id": None, "error": {"code": -32700, "message": "Parse error"}})
+            self._send_error(None, -32700, "Parse error")
             return
 
         req_id = request.get("id")
         method = request.get("method", "")
+        params = request.get("params") or {}
 
         if method == "initialize":
-            result = {
+            self._send_result(req_id, {
                 "protocolVersion": PROTOCOL_VERSION,
                 "serverInfo": {"name": SERVER_NAME, "version": SERVER_VERSION},
                 "capabilities": {"tools": {}},
-            }
-            self._send_json({"jsonrpc": "2.0", "id": req_id, "result": result})
-
-        elif method == "tools/list":
-            tools = critter_lab.list_tools()
-            self._send_json({"jsonrpc": "2.0", "id": req_id, "result": {"tools": tools}})
-
-        elif method == "tools/call":
-            params = request.get("params", {})
-            tool_name = params.get("name", "")
-            arguments = params.get("arguments", {})
-
-            known_tools = {t["name"] for t in critter_lab.list_tools()}
-            if tool_name not in known_tools:
-                self._send_json({
-                    "jsonrpc": "2.0",
-                    "id": req_id,
-                    "error": {"code": -32601, "message": f"Unknown tool: {tool_name}"},
-                })
-                return
-
-            try:
-                result = critter_lab.dispatch(tool_name, arguments)
-                self._send_json({
-                    "jsonrpc": "2.0",
-                    "id": req_id,
-                    "result": {
-                        "content": [{"type": "text", "text": json.dumps(result)}],
-                        "isError": False,
-                    },
-                })
-            except (ValueError, TypeError) as exc:
-                self._send_json({
-                    "jsonrpc": "2.0",
-                    "id": req_id,
-                    "error": {"code": -32602, "message": str(exc)},
-                })
-
-        else:
-            self._send_json({
-                "jsonrpc": "2.0",
-                "id": req_id,
-                "error": {"code": -32601, "message": f"Unknown method: {method}"},
             })
+        elif method == "tools/list":
+            tools = cost_analyzer.list_tools()
+            self._send_result(req_id, {"tools": tools})
+        elif method == "tools/call":
+            tool_name = params.get("name", "")
+            arguments = params.get("arguments") or {}
+            try:
+                result = cost_analyzer.dispatch(tool_name, arguments)
+                self._send_result(req_id, {
+                    "content": [{"type": "text", "text": json.dumps(result)}],
+                    "isError": False,
+                })
+            except cost_analyzer.UnknownResourceError:
+                self._send_error(req_id, -32601, f"Unknown tool or resource: {tool_name}")
+            except (ValueError, TypeError) as exc:
+                self._send_error(req_id, -32602, str(exc))
+        else:
+            self._send_error(req_id, -32601, f"Unknown method: {method}")
 
-    def _send_json(self, obj):
+    def _send_result(self, req_id, result):
+        resp = {"jsonrpc": "2.0", "id": req_id, "result": result}
+        self._write_json(resp)
+
+    def _send_error(self, req_id, code, message):
+        resp = {"jsonrpc": "2.0", "id": req_id, "error": {"code": code, "message": message}}
+        self._write_json(resp)
+
+    def _write_json(self, obj):
         body = json.dumps(obj).encode()
         self.send_response(200)
         self.send_header("Content-Type", "application/json")
@@ -95,14 +82,11 @@ class MCPHandler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(body)
 
-    def log_message(self, format, *args):
-        pass
-
 
 def main():
-    parser = argparse.ArgumentParser(description="MCP server for critter_lab")
+    parser = argparse.ArgumentParser(description="MCP server for cost_analyzer")
     parser.add_argument("--port", type=int, default=int(os.environ.get("MCP_PORT", "9000")))
-    parser.add_argument("--host", default="127.0.0.1")
+    parser.add_argument("--host", type=str, default="127.0.0.1")
     args = parser.parse_args()
 
     server = ThreadingHTTPServer((args.host, args.port), MCPHandler)
