@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""MCP server for cost_analyzer — JSON-RPC 2.0 over HTTP."""
+"""MCP server for critter_lab — JSON-RPC 2.0 over HTTP."""
 
 import argparse
 import json
@@ -8,9 +8,9 @@ import sys
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 sys.path.insert(0, os.environ.get("COST_ANALYZER_DIR", os.path.dirname(os.path.abspath(__file__))))
-import cost_analyzer
+import critter_lab
 
-SERVER_NAME = "cost_analyzer"
+SERVER_NAME = "critter_lab"
 SERVER_VERSION = "1.0.0"
 PROTOCOL_VERSION = "2024-11-05"
 
@@ -46,7 +46,7 @@ class MCPHandler(BaseHTTPRequestHandler):
             self._send_json({"jsonrpc": "2.0", "id": req_id, "result": result})
 
         elif method == "tools/list":
-            tools = cost_analyzer.list_tools()
+            tools = critter_lab.list_tools()
             self._send_json({"jsonrpc": "2.0", "id": req_id, "result": {"tools": tools}})
 
         elif method == "tools/call":
@@ -54,7 +54,7 @@ class MCPHandler(BaseHTTPRequestHandler):
             tool_name = params.get("name", "")
             arguments = params.get("arguments", {})
 
-            known_tools = {t["name"] for t in cost_analyzer.list_tools()}
+            known_tools = {t["name"] for t in critter_lab.list_tools()}
             if tool_name not in known_tools:
                 self._send_json({
                     "jsonrpc": "2.0",
@@ -64,7 +64,7 @@ class MCPHandler(BaseHTTPRequestHandler):
                 return
 
             try:
-                result = cost_analyzer.dispatch(tool_name, arguments)
+                result = critter_lab.dispatch(tool_name, arguments)
                 self._send_json({
                     "jsonrpc": "2.0",
                     "id": req_id,
@@ -100,7 +100,7 @@ class MCPHandler(BaseHTTPRequestHandler):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="MCP server for cost_analyzer")
+    parser = argparse.ArgumentParser(description="MCP server for critter_lab")
     parser.add_argument("--port", type=int, default=int(os.environ.get("MCP_PORT", "9000")))
     parser.add_argument("--host", default="127.0.0.1")
     args = parser.parse_args()
