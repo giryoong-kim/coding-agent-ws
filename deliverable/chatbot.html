@@ -9,144 +9,161 @@
 
     body {
       font-family: system-ui, -apple-system, sans-serif;
-      background: #0f1117;
-      color: #e2e8f0;
+      background: #f0f4f8;
+      color: #1a202c;
       min-height: 100vh;
       display: flex;
+      flex-direction: column;
       align-items: center;
-      justify-content: center;
-      padding: 2rem;
+      padding: 2rem 1rem;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    header h1 {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #2d3748;
+    }
+
+    header p {
+      margin-top: 0.4rem;
+      color: #718096;
+      font-size: 0.95rem;
     }
 
     .card {
-      background: #1a1d27;
-      border: 1px solid #2d3148;
+      background: #fff;
       border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
       padding: 2rem;
       width: 100%;
       max-width: 600px;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
-    }
-
-    h1 {
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: #a78bfa;
-      margin-bottom: 1.5rem;
-      letter-spacing: -0.02em;
     }
 
     label {
       display: block;
-      font-size: 0.85rem;
-      color: #94a3b8;
+      font-weight: 600;
       margin-bottom: 0.4rem;
-      font-weight: 500;
+      font-size: 0.9rem;
+      color: #4a5568;
     }
 
     .input-row {
       display: flex;
       gap: 0.5rem;
-      margin-bottom: 1rem;
     }
 
     input[type="text"] {
       flex: 1;
-      background: #0f1117;
-      border: 1px solid #2d3148;
-      border-radius: 8px;
       padding: 0.6rem 0.9rem;
-      color: #e2e8f0;
+      border: 1px solid #cbd5e0;
+      border-radius: 8px;
       font-size: 1rem;
       outline: none;
-      transition: border-color 0.15s;
+      transition: border-color 0.2s;
     }
 
     input[type="text"]:focus {
-      border-color: #7c3aed;
+      border-color: #4299e1;
     }
 
     button.estimate-btn {
-      background: #7c3aed;
+      padding: 0.6rem 1.2rem;
+      background: #4299e1;
       color: #fff;
       border: none;
       border-radius: 8px;
-      padding: 0.6rem 1.2rem;
       font-size: 1rem;
       font-weight: 600;
       cursor: pointer;
-      transition: background 0.15s;
+      transition: background 0.2s;
       white-space: nowrap;
     }
 
-    button.estimate-btn:hover { background: #6d28d9; }
-    button.estimate-btn:disabled { background: #4c1d95; cursor: not-allowed; opacity: 0.6; }
+    button.estimate-btn:hover { background: #3182ce; }
+    button.estimate-btn:disabled { background: #a0aec0; cursor: not-allowed; }
 
     .chips {
       display: flex;
       flex-wrap: wrap;
       gap: 0.5rem;
-      margin-bottom: 1.5rem;
+      margin-top: 1rem;
     }
 
     .chip {
-      background: #1e2235;
-      border: 1px solid #3b4266;
+      padding: 0.3rem 0.8rem;
+      background: #ebf8ff;
+      color: #2b6cb0;
+      border: 1px solid #bee3f8;
       border-radius: 999px;
-      padding: 0.3rem 0.85rem;
-      font-size: 0.82rem;
-      color: #a5b4fc;
+      font-size: 0.85rem;
       cursor: pointer;
-      transition: background 0.12s, border-color 0.12s;
-      user-select: none;
+      transition: background 0.15s, border-color 0.15s;
     }
 
     .chip:hover {
-      background: #2a2f4a;
-      border-color: #7c3aed;
-      color: #c4b5fd;
+      background: #bee3f8;
+      border-color: #90cdf4;
     }
 
-    .result-label {
-      font-size: 0.8rem;
-      color: #64748b;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      margin-bottom: 0.4rem;
+    .result-section {
+      margin-top: 1.5rem;
     }
 
-    pre#result {
-      background: #0b0d14;
-      border: 1px solid #1e2235;
-      border-radius: 8px;
+    .result-section h2 {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #4a5568;
+      margin-bottom: 0.5rem;
+    }
+
+    pre {
+      background: #1a202c;
+      color: #e2e8f0;
       padding: 1rem;
+      border-radius: 8px;
       font-size: 0.85rem;
-      color: #86efac;
+      overflow-x: auto;
       white-space: pre-wrap;
       word-break: break-word;
-      min-height: 80px;
-      line-height: 1.6;
-      overflow-x: auto;
+      min-height: 3rem;
     }
 
-    pre#result.error { color: #fca5a5; }
-    pre#result.loading { color: #94a3b8; font-style: italic; }
-
-    .endpoint-note {
-      margin-top: 1rem;
-      font-size: 0.72rem;
-      color: #475569;
-      text-align: right;
+    pre.error {
+      background: #fff5f5;
+      color: #c53030;
+      border: 1px solid #fed7d7;
     }
+
+    .spinner {
+      display: inline-block;
+      width: 1rem;
+      height: 1rem;
+      border: 2px solid #fff;
+      border-top-color: transparent;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+      vertical-align: middle;
+      margin-right: 0.3rem;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
   </style>
 </head>
 <body>
-  <div class="card">
+  <header>
     <h1>Cost Analyzer Helpdesk</h1>
+    <p>Get monthly EC2 cost estimates powered by the MCP pricing server.</p>
+  </header>
 
+  <div class="card">
     <label for="instance_type">instance type, e.g. m5.large</label>
     <div class="input-row">
-      <input type="text" id="instance_type" placeholder="instance type, e.g. m5.large" autocomplete="off" />
+      <input type="text" id="instance_type" placeholder="instance type, e.g. m5.large" />
       <button class="estimate-btn" id="estimateBtn" onclick="runEstimate()">Estimate</button>
     </div>
 
@@ -156,45 +173,43 @@
       <span class="chip" onclick="prefill('r5.xlarge')">r5.xlarge</span>
     </div>
 
-    <div class="result-label">Result</div>
-    <pre id="result" class="loading">Enter an instance type and click Estimate.</pre>
-
-    <div class="endpoint-note">MCP endpoint: http://127.0.0.1:52985</div>
+    <div class="result-section">
+      <h2>Result</h2>
+      <pre id="resultBlock">Results will appear here after you click Estimate.</pre>
+    </div>
   </div>
 
   <script>
-    const ENDPOINT = "http://127.0.0.1:52985";
-    const TOOL = "estimate_ec2_monthly_cost";
-    const INPUT_FIELD = "instance_type";
+    const ENDPOINT = "http://127.0.0.1:36997";
 
     function prefill(value) {
-      document.getElementById(INPUT_FIELD).value = value;
-      document.getElementById(INPUT_FIELD).focus();
+      document.getElementById("instance_type").value = value;
     }
 
     async function runEstimate() {
-      const input = document.getElementById(INPUT_FIELD).value.trim();
-      const resultEl = document.getElementById("result");
+      const instanceType = document.getElementById("instance_type").value.trim();
       const btn = document.getElementById("estimateBtn");
+      const resultBlock = document.getElementById("resultBlock");
 
-      if (!input) {
-        resultEl.className = "error";
-        resultEl.textContent = "Error: please enter an instance type.";
+      if (!instanceType) {
+        resultBlock.className = "error";
+        resultBlock.textContent = "Please enter an instance type before estimating.";
         return;
       }
 
-      resultEl.className = "loading";
-      resultEl.textContent = "Calling MCP endpoint...";
       btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span>Loading…';
+      resultBlock.className = "";
+      resultBlock.textContent = "Calling MCP server…";
 
       const requestBody = {
         jsonrpc: "2.0",
         id: Date.now(),
         method: "tools/call",
         params: {
-          name: TOOL,
+          name: "estimate_ec2_monthly_cost",
           arguments: {
-            [INPUT_FIELD]: input
+            instance_type: instanceType
           }
         }
       };
@@ -209,21 +224,22 @@
         const data = await response.json();
 
         if (data.error) {
-          resultEl.className = "error";
-          resultEl.textContent = "JSON-RPC Error:\n" + JSON.stringify(data.error, null, 2);
+          resultBlock.className = "error";
+          resultBlock.textContent = "MCP Error:\n" + JSON.stringify(data.error, null, 2);
         } else {
-          resultEl.className = "";
-          resultEl.textContent = JSON.stringify(data.result, null, 2);
+          resultBlock.className = "";
+          resultBlock.textContent = JSON.stringify(data.result, null, 2);
         }
       } catch (err) {
-        resultEl.className = "error";
-        resultEl.textContent = "Fetch error: " + err.message;
+        resultBlock.className = "error";
+        resultBlock.textContent = "Network error: " + err.message;
       } finally {
         btn.disabled = false;
+        btn.textContent = "Estimate";
       }
     }
 
-    document.getElementById(INPUT_FIELD).addEventListener("keydown", function(e) {
+    document.getElementById("instance_type").addEventListener("keydown", function(e) {
       if (e.key === "Enter") runEstimate();
     });
   </script>
