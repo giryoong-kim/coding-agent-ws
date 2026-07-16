@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""MCP server for cost_analyzer: JSON-RPC 2.0 over HTTP, stdlib only."""
+"""MCP JSON-RPC 2.0 server wrapping the cost_analyzer module."""
 
 import argparse
 import json
@@ -11,7 +11,7 @@ sys.path.insert(0, os.environ.get("COST_ANALYZER_DIR", os.path.dirname(os.path.a
 import cost_analyzer
 
 SERVER_NAME = "cost_analyzer"
-SERVER_VERSION = "0.1.0"
+SERVER_VERSION = "1.0.0"
 PROTOCOL_VERSION = "2024-11-05"
 
 
@@ -51,22 +51,22 @@ class MCPHandler(BaseHTTPRequestHandler):
             self._send_json({"jsonrpc": "2.0", "id": req_id, "result": {"tools": tools}})
 
         elif method == "tools/call":
-            name = params.get("name", "")
+            tool_name = params.get("name", "")
             arguments = params.get("arguments", {})
             try:
-                result = cost_analyzer.dispatch(name, arguments)
-                call_result = {
-                    "content": [{"type": "text", "text": json.dumps(result)}],
-                    "isError": False,
-                }
-                self._send_json({"jsonrpc": "2.0", "id": req_id, "result": call_result})
-            except cost_analyzer.UnknownResourceError:
-                self._send_json({"jsonrpc": "2.0", "id": req_id, "error": {"code": -32601, "message": f"Unknown tool: {name}"}})
+                result = cost_analyzer.dispatch(tool_name, arguments)
+                content = [{"type": "text", "text": json.dumps(result)}]
+                self._send_json({"jsonrpc": "2.0", "id": req_id, "result": {"content": content, "isError": False}})
+            except (cost_analyzer.UnknownResourceError, KeyError) as exc:
+                if isinstance(exc, cost_analyzer.UnknownResourceError) and "Unknown tool" in str(exc):
+                    self._send_json({"jsonrpc": "2.0", "id": req_id, "error": {"code": -32601, "message": str(exc)}})
+                else:
+                    self._send_json({"jsonrpc": "2.0", "id": req_id, "error": {"code": -32602, "message": str(exc)}})
             except (ValueError, TypeError) as exc:
                 self._send_json({"jsonrpc": "2.0", "id": req_id, "error": {"code": -32602, "message": str(exc)}})
 
         else:
-            self._send_json({"jsonrpc": "2.0", "id": req_id, "error": {"code": -32601, "message": f"Unknown method: {method}"}})
+            self._send_json({"jsonrpc": "2.0", "id": req_id, "error": {"code": -32601, "message": f"Unknown method: {method!r}"}})
 
     def _send_json(self, obj):
         body = json.dumps(obj).encode()

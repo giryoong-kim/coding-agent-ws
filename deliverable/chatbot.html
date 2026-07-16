@@ -8,198 +8,136 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-family: system-ui, -apple-system, sans-serif;
       background: #0f1117;
       color: #e2e8f0;
       min-height: 100vh;
       display: flex;
-      flex-direction: column;
       align-items: center;
-      padding: 2rem 1rem;
-    }
-
-    header {
-      text-align: center;
-      margin-bottom: 2rem;
-    }
-
-    header h1 {
-      font-size: 1.75rem;
-      font-weight: 700;
-      color: #f7fafc;
-      letter-spacing: -0.02em;
-    }
-
-    header p {
-      margin-top: 0.4rem;
-      font-size: 0.9rem;
-      color: #718096;
+      justify-content: center;
+      padding: 2rem;
     }
 
     .card {
       background: #1a1d27;
-      border: 1px solid #2d3748;
+      border: 1px solid #2d3148;
       border-radius: 12px;
-      padding: 1.75rem;
+      padding: 2rem;
       width: 100%;
       max-width: 600px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
     }
 
-    label {
-      display: block;
-      font-size: 0.85rem;
-      font-weight: 600;
-      color: #a0aec0;
-      margin-bottom: 0.5rem;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
+    h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #a78bfa;
+      margin-bottom: 1.5rem;
+      text-align: center;
+      letter-spacing: -0.02em;
     }
 
     .input-row {
       display: flex;
       gap: 0.5rem;
+      margin-bottom: 0.75rem;
     }
 
     input[type="text"] {
       flex: 1;
       background: #0f1117;
-      border: 1px solid #2d3748;
+      border: 1px solid #2d3148;
       border-radius: 8px;
-      padding: 0.6rem 0.9rem;
-      font-size: 1rem;
       color: #e2e8f0;
+      font-size: 1rem;
+      padding: 0.6rem 0.9rem;
       outline: none;
-      transition: border-color 0.15s;
+      transition: border-color 0.2s;
     }
 
     input[type="text"]:focus {
-      border-color: #4299e1;
-    }
-
-    input[type="text"]::placeholder {
-      color: #4a5568;
+      border-color: #7c3aed;
     }
 
     button.estimate-btn {
-      background: #3182ce;
-      color: #fff;
+      background: #7c3aed;
       border: none;
       border-radius: 8px;
-      padding: 0.6rem 1.25rem;
-      font-size: 0.95rem;
-      font-weight: 600;
+      color: #fff;
       cursor: pointer;
-      transition: background 0.15s;
+      font-size: 1rem;
+      font-weight: 600;
+      padding: 0.6rem 1.2rem;
+      transition: background 0.2s;
       white-space: nowrap;
     }
 
-    button.estimate-btn:hover:not(:disabled) {
-      background: #2b6cb0;
-    }
-
-    button.estimate-btn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
+    button.estimate-btn:hover { background: #6d28d9; }
+    button.estimate-btn:disabled { background: #4b3a7a; cursor: not-allowed; }
 
     .chips {
       display: flex;
       flex-wrap: wrap;
-      gap: 0.5rem;
-      margin-top: 0.85rem;
+      gap: 0.4rem;
+      margin-bottom: 1.25rem;
     }
 
     .chip {
-      background: #2d3748;
-      border: 1px solid #4a5568;
+      background: #252840;
+      border: 1px solid #3b3f6b;
       border-radius: 20px;
-      padding: 0.3rem 0.85rem;
-      font-size: 0.82rem;
-      color: #90cdf4;
+      color: #c4b5fd;
       cursor: pointer;
-      transition: background 0.12s, border-color 0.12s;
-      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: 0.82rem;
+      padding: 0.25rem 0.75rem;
+      transition: background 0.15s, border-color 0.15s;
+      user-select: none;
     }
 
     .chip:hover {
-      background: #3182ce;
-      border-color: #3182ce;
-      color: #fff;
+      background: #312e6e;
+      border-color: #7c3aed;
     }
 
-    .result-section {
-      margin-top: 1.5rem;
-    }
-
-    .result-section h2 {
-      font-size: 0.85rem;
-      font-weight: 600;
-      color: #a0aec0;
+    .result-label {
+      font-size: 0.78rem;
+      color: #6b7280;
       text-transform: uppercase;
-      letter-spacing: 0.06em;
-      margin-bottom: 0.6rem;
+      letter-spacing: 0.08em;
+      margin-bottom: 0.4rem;
     }
 
     pre#result {
       background: #0f1117;
-      border: 1px solid #2d3748;
+      border: 1px solid #2d3148;
       border-radius: 8px;
+      color: #a3e635;
+      font-size: 0.88rem;
+      line-height: 1.55;
+      min-height: 80px;
+      overflow-x: auto;
       padding: 1rem;
-      font-size: 0.85rem;
-      font-family: "SFMono-Regular", Consolas, "Courier New", monospace;
-      color: #68d391;
       white-space: pre-wrap;
       word-break: break-word;
-      min-height: 3.5rem;
-      line-height: 1.55;
     }
 
-    pre#result.error {
-      color: #fc8181;
-    }
-
-    pre#result.empty {
-      color: #4a5568;
-      font-style: italic;
-    }
-
-    .spinner {
-      display: inline-block;
-      width: 14px;
-      height: 14px;
-      border: 2px solid rgba(255,255,255,0.3);
-      border-top-color: #fff;
-      border-radius: 50%;
-      animation: spin 0.6s linear infinite;
-      vertical-align: middle;
-      margin-right: 6px;
-    }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
+    pre#result.error { color: #f87171; }
+    pre#result.loading { color: #94a3b8; }
   </style>
 </head>
 <body>
-  <header>
-    <h1>Cost Analyzer Helpdesk</h1>
-    <p>Enter an EC2 instance type to get a monthly cost estimate.</p>
-  </header>
-
   <div class="card">
-    <label for="instance_type">Instance Type</label>
+    <h1>Cost Analyzer Helpdesk</h1>
+
     <div class="input-row">
       <input
         type="text"
         id="instance_type"
-        name="instance_type"
         placeholder="instance type, e.g. m5.large"
         autocomplete="off"
         spellcheck="false"
       />
-      <button class="estimate-btn" id="estimateBtn" onclick="runEstimate()">
-        Estimate
-      </button>
+      <button class="estimate-btn" id="estimateBtn" onclick="runEstimate()">Estimate</button>
     </div>
 
     <div class="chips">
@@ -208,14 +146,12 @@
       <span class="chip" onclick="prefill('r5.xlarge')">r5.xlarge</span>
     </div>
 
-    <div class="result-section">
-      <h2>Result</h2>
-      <pre id="result" class="empty">Results will appear here.</pre>
-    </div>
+    <div class="result-label">Result</div>
+    <pre id="result">Enter an instance type and click Estimate.</pre>
   </div>
 
   <script>
-    const MCP_ENDPOINT = "http://127.0.0.1:37483";
+    const ENDPOINT = "http://127.0.0.1:47279";
 
     function prefill(value) {
       document.getElementById("instance_type").value = value;
@@ -223,66 +159,57 @@
     }
 
     async function runEstimate() {
-      const input = document.getElementById("instance_type").value.trim();
+      const instanceType = document.getElementById("instance_type").value.trim();
       const resultEl = document.getElementById("result");
       const btn = document.getElementById("estimateBtn");
 
-      if (!input) {
+      if (!instanceType) {
         resultEl.className = "error";
-        resultEl.textContent = "Please enter an instance type before clicking Estimate.";
+        resultEl.textContent = "Please enter an instance type.";
         return;
       }
 
       btn.disabled = true;
-      btn.innerHTML = '<span class="spinner"></span>Fetching\u2026';
-      resultEl.className = "empty";
-      resultEl.textContent = "Calling MCP endpoint\u2026";
+      resultEl.className = "loading";
+      resultEl.textContent = "Calling MCP endpoint...";
 
-      const payload = {
+      const requestBody = {
         jsonrpc: "2.0",
         id: Date.now(),
         method: "tools/call",
         params: {
           name: "estimate_ec2_monthly_cost",
           arguments: {
-            instance_type: input
+            instance_type: instanceType
           }
         }
       };
 
       try {
-        const response = await fetch(MCP_ENDPOINT, {
+        const response = await fetch(ENDPOINT, {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Accept": "application/json"
-          },
-          body: JSON.stringify(payload)
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(requestBody)
         });
-
-        if (!response.ok) {
-          throw new Error("HTTP " + response.status + " " + response.statusText);
-        }
 
         const data = await response.json();
 
         if (data.error) {
           resultEl.className = "error";
-          resultEl.textContent = "JSON-RPC Error " + data.error.code + ": " + data.error.message;
+          resultEl.textContent = "Error " + data.error.code + ": " + data.error.message;
         } else {
           resultEl.className = "";
           resultEl.textContent = JSON.stringify(data.result, null, 2);
         }
       } catch (err) {
         resultEl.className = "error";
-        resultEl.textContent = "Request failed: " + err.message;
+        resultEl.textContent = "Network error: " + err.message;
       } finally {
         btn.disabled = false;
-        btn.textContent = "Estimate";
       }
     }
 
-    document.getElementById("instance_type").addEventListener("keydown", function(e) {
+    document.getElementById("instance_type").addEventListener("keydown", function (e) {
       if (e.key === "Enter") runEstimate();
     });
   </script>
